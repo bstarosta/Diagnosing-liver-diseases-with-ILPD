@@ -40,12 +40,12 @@ random_state = 42
 max_iter = 1500
 
 classifiers = {
-    '2N': MLPClassifier(solver='sgd', hidden_layer_sizes=(2,), max_iter=max_iter, momentum=0, random_state=random_state),
     '5N': MLPClassifier(solver='sgd', hidden_layer_sizes=(5,), max_iter=max_iter, momentum=0, random_state=random_state),
     '10N': MLPClassifier(solver='sgd', hidden_layer_sizes=(10,), max_iter=max_iter, momentum=0, random_state=random_state),
-    '2N momentum': MLPClassifier(solver='sgd', hidden_layer_sizes=(2,), max_iter=max_iter, momentum=0.9, random_state=random_state),
+    '20N': MLPClassifier(solver='sgd', hidden_layer_sizes=(20,), max_iter=max_iter, momentum=0, random_state=random_state),
     '5N momentum': MLPClassifier(solver='sgd', hidden_layer_sizes=(5,), max_iter=max_iter, momentum=0.9, random_state=random_state),
     '10N momentum': MLPClassifier(solver='sgd', hidden_layer_sizes=(10,), max_iter=max_iter, momentum=0.9, random_state=random_state),
+    '20N momentum': MLPClassifier(solver='sgd', hidden_layer_sizes=(20,), max_iter=max_iter, momentum=0.9, random_state=random_state),
 }
 
 n_repeats = 5
@@ -70,7 +70,7 @@ for n_features in range(1, n_total_features+1):
 mean_scores = np.mean(scores, axis=2)
 
 headers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
-rows = np.array([["2N"], ["5N"], ["10N"], ["2N momentum"], ["5N momentum"], ["10N momentum"]])
+rows = np.array([["5N"], ["10N"], ["20N"], ["5N momentum"], ["10N momentum"], ["20N momentum"]])
 score_table = np.concatenate((rows, mean_scores), axis=1)
 score_table = tabulate(score_table, headers, floatfmt=".4f")
 print("\nMean scores:\n", score_table)
@@ -85,29 +85,29 @@ for i in range(len(classifiers)):
     for j in range(len(classifiers)):
         t_statistic[i, j], p_value[i, j] = ttest_ind(scores[i, best_score_indexes[i]], scores[j, best_score_indexes[j]])
 
-headers = ["2N", "5N", "10N", "2N momentum", "5N momentum", "10N momentum"]
-rows = np.array([["2N"], ["5N"], ["10N"], ["2N momentum"], ["5N momentum"], ["10N momentum"]])
+headers = ["5N", "10N", "20N", "5N momentum", "10N momentum", "20N momentum"]
+rows = np.array([["5N"], ["10N"], ["20N"], ["5N momentum"], ["10N momentum"], ["20N momentum"]])
+
 t_statistic_table = np.concatenate((rows, t_statistic), axis=1)
 t_statistic_table = tabulate(t_statistic_table, headers, floatfmt=".2f")
+print("\nt-statistic:\n", t_statistic_table)
+
 p_value_table = np.concatenate((rows, p_value), axis=1)
 p_value_table = tabulate(p_value_table, headers, floatfmt=".2f")
-print("\nt-statistic:\n", t_statistic_table, "\n\np-value:\n", p_value_table)
+print("\np-value:\n", p_value_table)
 
 advantage = np.zeros((len(classifiers), len(classifiers)))
 advantage[t_statistic > 0] = 1
-advantage_table = tabulate(np.concatenate(
-    (rows, advantage), axis=1), headers)
+advantage_table = tabulate(np.concatenate((rows, advantage), axis=1), headers)
 print("\nAdvantage:\n", advantage_table)
 
 significance = np.zeros((len(classifiers), len(classifiers)))
 significance[p_value <= alpha] = 1
-significance_table = tabulate(np.concatenate(
-    (rows, significance), axis=1), headers)
+significance_table = tabulate(np.concatenate((rows, significance), axis=1), headers)
 print("\nStatistical significance:\n", significance_table)
 
 stat_better = significance * advantage
-stat_better_table = tabulate(np.concatenate(
-    (rows, stat_better), axis=1), headers)
+stat_better_table = tabulate(np.concatenate((rows, stat_better), axis=1), headers)
 print("\nStatistically significantly better:\n", stat_better_table)
 
 
