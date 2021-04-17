@@ -2,7 +2,9 @@
   <dictionary name="bstar">
     <words>
       <w>dataset</w>
+      <w>pred</w>
       <w>preprocessing</w>
+      <w>scaler</w>
     </words>
   </dictionary>
 </component>
